@@ -1,19 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class Dice : MonoBehaviour
 {
     public int numberOfSides = 6; // Typical dice has 6 sides
     private int currentSide;
 
-    public Text diceText; // Reference to the UI Text component
+    public Image diceImage; // Reference to the UI Image component
+    public Sprite[] diceFaces; // Array to hold dice face sprites
 
     void Start()
     {
         gameObject.SetActive(false); // Initially hide the dice
     }
 
-    /**
     public void RollDice()
     {
         gameObject.SetActive(true); // Show the dice
@@ -29,21 +30,23 @@ public class Dice : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             currentSide = Random.Range(1, numberOfSides + 1);
-            UpdateDiceText();
+            UpdateDiceFace();
             yield return null;
         }
 
         Debug.Log("Rolled: " + currentSide);
     }
 
-    private void UpdateDiceText()
+    private void UpdateDiceFace()
     {
-        diceText.text = currentSide.ToString();
+        if (diceFaces.Length >= numberOfSides)
+        {
+            diceImage.sprite = diceFaces[currentSide - 1];
+        }
     }
 
     public int GetCurrentSide()
     {
         return currentSide;
     }
-    **/
 }
