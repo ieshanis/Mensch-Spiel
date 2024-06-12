@@ -1,52 +1,61 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
+using UnityEngine;
 
 public class Dice : MonoBehaviour
 {
-    public int numberOfSides = 6; // Typical dice has 6 sides
-    private int currentSide;
 
-    public Image diceImage; // Reference to the UI Image component
-    public Sprite[] diceFaces; // Array to hold dice face sprites
+    // Array of dice sides sprites to load from Resources folder
+    private Sprite[] diceSides;
 
-    void Start()
+    // Reference to sprite renderer to change sprites
+    private SpriteRenderer rend;
+
+    // Use this for initialization
+    private void Start()
     {
-        gameObject.SetActive(false); // Initially hide the dice
+
+        // Assign Renderer component
+        rend = GetComponent<SpriteRenderer>();
+
+        // Load dice sides sprites to array from DiceSides subfolder of Resources folder
+        diceSides = Resources.LoadAll<Sprite>("DiceSides/");
     }
 
-    public void RollDice()
+    // If you left click over the dice then RollTheDice coroutine is started
+    private void OnMouseDown()
     {
-        gameObject.SetActive(true); // Show the dice
-        StartCoroutine(RollingCoroutine());
+        StartCoroutine("RollTheDice");
     }
 
-    private IEnumerator RollingCoroutine()
+    // Coroutine that rolls the dice
+    private IEnumerator RollTheDice()
     {
-        float rollDuration = 1.0f; // duration of the roll in seconds
-        float elapsedTime = 0f;
+        // Variable to contain random dice side number.
+        // It needs to be assigned. Let it be 0 initially
+        int randomDiceSide = 0;
 
-        while (elapsedTime < rollDuration)
+        // Final side or value that dice reads in the end of coroutine
+        int finalSide = 0;
+
+        // Loop to switch dice sides ramdomly
+        // before final side appears. 20 itterations here.
+        for (int i = 0; i <= 20; i++)
         {
-            elapsedTime += Time.deltaTime;
-            currentSide = Random.Range(1, numberOfSides + 1);
-            UpdateDiceFace();
-            yield return null;
+            // Pick up random value from 0 to 5 (All inclusive)
+            randomDiceSide = Random.Range(0, 5);
+
+            // Set sprite to upper face of dice from array according to random value
+            rend.sprite = diceSides[randomDiceSide];
+
+            // Pause before next itteration
+            yield return new WaitForSeconds(0.05f);
         }
 
-        Debug.Log("Rolled: " + currentSide);
-    }
+        // Assigning final side so you can use this value later in your game
+        // for player movement for example
+        finalSide = randomDiceSide + 1;
 
-    private void UpdateDiceFace()
-    {
-        if (diceFaces.Length >= numberOfSides)
-        {
-            diceImage.sprite = diceFaces[currentSide - 1];
-        }
-    }
-
-    public int GetCurrentSide()
-    {
-        return currentSide;
+        // Show final dice value in Console
+        Debug.Log(finalSide);
     }
 }
