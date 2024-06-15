@@ -32,10 +32,10 @@ public class Dice : MonoBehaviour
         int finalSide = 0;
 
         // Loop to switch dice sides randomly before final side appears. 20 iterations here.
-        for (int i = 0; i <= 20; i++)
+        for (int i = 0; i < 20; i++)
         {
-            // Pick up random value from 0 to 5 (inclusive)
-            int randomDiceSide = Random.Range(0, 6); // corrected from 0 to 5 to 0 to 6 to include all 6 sides
+            // Pick up random value from 0 to 5 (All inclusive)
+            int randomDiceSide = Random.Range(0, diceSides.Length);
 
             // Set sprite to upper face of dice from array according to random value
             rend.sprite = diceSides[randomDiceSide];
@@ -44,15 +44,36 @@ public class Dice : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
         }
 
-        // Assigning final side so you can use this value later in your game
-        // for player movement for example
-        finalSide = Random.Range(1, 7); // rolling a 6-sided dice, so finalSide should be between 1 and 6
+        // Assigning final side based on the sprite name
+        finalSide = GetDiceSideNumber(diceSides[randomDiceSide].name);
 
         // Show final dice value in Console
         Debug.Log("Dice rolled: " + finalSide);
 
-        
-        
+  
         GameManager.instance.OnDiceRolled(finalSide);
+    }
+
+    // Function to get the number of the dice side from the sprite name
+    private int GetDiceSideNumber(string spriteName)
+    {
+        switch (spriteName)
+        {
+            case "one":
+                return 1;
+            case "two":
+                return 2;
+            case "three":
+                return 3;
+            case "four":
+                return 4;
+            case "five":
+                return 5;
+            case "six":
+                return 6;
+            default:
+                Debug.LogError("Unknown sprite name: " + spriteName);
+                return -1; // Invalid number
+        }
     }
 }
