@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Dice : MonoBehaviour
 {
-
     // Array of dice sides sprites to load from Resources folder
     private Sprite[] diceSides;
 
@@ -13,7 +12,6 @@ public class Dice : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-
         // Assign Renderer component
         rend = GetComponent<SpriteRenderer>();
 
@@ -31,31 +29,51 @@ public class Dice : MonoBehaviour
     private IEnumerator RollTheDice()
     {
         // Variable to contain random dice side number.
-        // It needs to be assigned. Let it be 0 initially
         int randomDiceSide = 0;
 
         // Final side or value that dice reads in the end of coroutine
         int finalSide = 0;
 
-        // Loop to switch dice sides ramdomly
-        // before final side appears. 20 itterations here.
-        for (int i = 0; i <= 20; i++)
+        // Loop to switch dice sides randomly before final side appears. 20 iterations here.
+        for (int i = 0; i < 20; i++)
         {
             // Pick up random value from 0 to 5 (All inclusive)
-            randomDiceSide = Random.Range(0, 5);
+            randomDiceSide = Random.Range(0, diceSides.Length);
 
             // Set sprite to upper face of dice from array according to random value
             rend.sprite = diceSides[randomDiceSide];
 
-            // Pause before next itteration
+            // Pause before next iteration
             yield return new WaitForSeconds(0.05f);
         }
 
-        // Assigning final side so you can use this value later in your game
-        // for player movement for example
-        finalSide = randomDiceSide + 1;
+        // Assigning final side based on the sprite name
+        finalSide = GetDiceSideNumber(diceSides[randomDiceSide].name);
 
         // Show final dice value in Console
-        Debug.Log(finalSide);
+        Debug.Log("Dice rolled: " + finalSide);
+    }
+
+    // Function to get the number of the dice side from the sprite name
+    private int GetDiceSideNumber(string spriteName)
+    {
+        switch (spriteName)
+        {
+            case "one":
+                return 1;
+            case "two":
+                return 2;
+            case "three":
+                return 3;
+            case "four":
+                return 4;
+            case "five":
+                return 5;
+            case "six":
+                return 6;
+            default:
+                Debug.LogError("Unknown sprite name: " + spriteName);
+                return -1; // Invalid number
+        }
     }
 }
