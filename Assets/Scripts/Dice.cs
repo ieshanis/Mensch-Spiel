@@ -30,12 +30,13 @@ public class Dice : MonoBehaviour
     {
         // Final side or value that dice reads in the end of coroutine
         int finalSide = 0;
+        int randomDiceSide = 0;
 
         // Loop to switch dice sides randomly before final side appears. 20 iterations here.
         for (int i = 0; i < 20; i++)
         {
             // Pick up random value from 0 to 5 (All inclusive)
-            int randomDiceSide = Random.Range(0, diceSides.Length);
+            randomDiceSide = Random.Range(0, diceSides.Length);
 
             // Set sprite to upper face of dice from array according to random value
             rend.sprite = diceSides[randomDiceSide];
