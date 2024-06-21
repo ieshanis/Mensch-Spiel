@@ -9,6 +9,9 @@ public class Dice : MonoBehaviour
     // Reference to sprite renderer to change sprites
     private SpriteRenderer rend;
 
+    // Reference to the TurnManager to notify when dice roll is complete
+    private TurnManager turnManager;
+
     // Use this for initialization
     private void Start()
     {
@@ -17,6 +20,14 @@ public class Dice : MonoBehaviour
 
         // Load dice sides sprites to array from DiceSides subfolder of Resources folder
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
+
+        // Find the TurnManager in the scene
+        turnManager = FindObjectOfType<TurnManager>();
+
+        if (turnManager == null)
+        {
+            Debug.LogError("TurnManager not found in the scene.");
+        }
     }
 
     // If you left click over the dice then RollTheDice coroutine is started
@@ -51,8 +62,11 @@ public class Dice : MonoBehaviour
         // Show final dice value in Console
         Debug.Log("Dice rolled: " + finalSide);
 
-  
-        GameManager.instance.OnDiceRolled(finalSide);
+        // Notify TurnManager of the dice roll result
+        if (turnManager != null)
+        {
+            turnManager.OnDiceRolled(finalSide);
+        }
     }
 
     // Function to get the number of the dice side from the sprite name
