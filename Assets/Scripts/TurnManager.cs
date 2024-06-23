@@ -1,44 +1,56 @@
+using System.Collections;
 using UnityEngine;
 
 public class TurnManager : MonoBehaviour
 {
     public Dice dice;
     public CardManager cardManager;
-    public Player[] players; // Array of players in the game
+
+    private GameManager gameManager;
     private int currentPlayerIndex = 0;
+    private int diceValue;
 
     private void Start()
     {
-        StartTurn();
+        gameManager = GameManager.instance;
+        if (gameManager == null)
+        {
+            Debug.LogError("GameManager not found in the scene.");
+        }
     }
 
-    private void StartTurn()
+    public void StartTurn()
     {
-        Player currentPlayer = players[currentPlayerIndex];
-        Debug.Log("It's " + currentPlayer.playerName + "'s turn!");
-
-        // Enable dice rolling for the current player
-        dice.gameObject.SetActive(true);
+        StartCoroutine(TurnSequence());
     }
 
-    public void OnDiceRolled(int diceValue)
+    private IEnumerator TurnSequence()
     {
-        Debug.Log("Dice rolled: " + diceValue);
+        // Step 1: Roll the dice
+        yield return StartCoroutine(RollDice());
 
-        // Move the current player's figure
-        players[currentPlayerIndex].figures[0].Move(diceValue); // For now, just move the first figure
-
-        // Show cards for the player to choose
+        // Step 2: Show cards and let player choose one
         cardManager.ShowCards();
+        // Wait until the card is selected
+        yield return new WaitUntil(() => cardManager.IsCardSelected);
+
+        // Step 3: Apply card effect
+        string cardEffect = cardManager.GetSelectedCardEffect();
+        ApplyCardEffect(cardEffect);
+
+        // Step 4: Move the player based on dice value
+        gameManager.OnDiceRolled(diceValue);
+
+        // Proceed to the next player
+        currentPlayerIndex++;
     }
 
-    public void OnCardSelected(string effect)
+    private IEnumerator RollDice()
     {
-        // Apply the selected card effect to the current player
-        ApplyCardEffect(effect);
-
-        // Proceed to the next player's turn
-        EndTurn();
+        dice.RollDice();
+        // Wait until dice roll is complete
+        yield return new WaitUntil(() => dice.IsRolled);
+        diceValue = dice.GetDiceValue();
     }
 
     private void ApplyCardEffect(string effect)
@@ -48,10 +60,11 @@ public class TurnManager : MonoBehaviour
             case "ExtraTurn":
                 Debug.Log("Player gets an extra turn!");
                 // Logic for extra turn
+                currentPlayerIndex--; // To give an extra turn
                 break;
             case "MoveDouble":
                 Debug.Log("Player moves double the dice value!");
-                // Logic for moving double the dice value
+                diceValue *= 2;
                 break;
             case "BlockOpponent":
                 Debug.Log("Player blocks an opponent!");
@@ -61,17 +74,5 @@ public class TurnManager : MonoBehaviour
                 Debug.Log("Unknown card effect!");
                 break;
         }
-    }
-
-    private void EndTurn()
-    {
-        // Disable dice rolling
-        dice.gameObject.SetActive(false);
-
-        // Move to the next player
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
-
-        // Start the next player's turn
-        StartTurn();
     }
 }

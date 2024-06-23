@@ -3,73 +3,40 @@ using UnityEngine;
 
 public class Dice : MonoBehaviour
 {
-    // Array of dice sides sprites to load from Resources folder
     private Sprite[] diceSides;
-
-    // Reference to sprite renderer to change sprites
     private SpriteRenderer rend;
+    private bool isRolled = false;
+    private int diceValue;
 
-    // Reference to the TurnManager to notify when dice roll is complete
-    private TurnManager turnManager;
-
-    // Use this for initialization
     private void Start()
     {
-        // Assign Renderer component
         rend = GetComponent<SpriteRenderer>();
-
-        // Load dice sides sprites to array from DiceSides subfolder of Resources folder
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
-
-        // Find the TurnManager in the scene
-        turnManager = FindObjectOfType<TurnManager>();
-
-        if (turnManager == null)
-        {
-            Debug.LogError("TurnManager not found in the scene.");
-        }
     }
 
-    // If you left click over the dice then RollTheDice coroutine is started
-    private void OnMouseDown()
+    public void RollDice()
     {
         StartCoroutine(RollTheDice());
     }
 
-    // Coroutine that rolls the dice
     private IEnumerator RollTheDice()
     {
-        // Final side or value that dice reads in the end of coroutine
-        int finalSide = 0;
+        isRolled = false;
         int randomDiceSide = 0;
 
-        // Loop to switch dice sides randomly before final side appears. 20 iterations here.
         for (int i = 0; i < 20; i++)
         {
-            // Pick up random value from 0 to 5 (All inclusive)
             randomDiceSide = Random.Range(0, diceSides.Length);
-
-            // Set sprite to upper face of dice from array according to random value
             rend.sprite = diceSides[randomDiceSide];
-
-            // Pause before next iteration
             yield return new WaitForSeconds(0.05f);
         }
 
-        // Assigning final side based on the sprite name
-        finalSide = GetDiceSideNumber(diceSides[randomDiceSide].name);
-
-        // Show final dice value in Console
-        Debug.Log("Dice rolled: " + finalSide);
-
-        // Notify TurnManager of the dice roll result
-        if (turnManager != null)
-        {
-            turnManager.OnDiceRolled(finalSide);
-        }
+        diceValue = GetDiceSideNumber(diceSides[randomDiceSide].name);
+        Debug.Log("Dice rolled: " + diceValue);
+        isRolled = true;
+        GameManager.instance.OnDiceRolled(diceValue);
     }
 
-    // Function to get the number of the dice side from the sprite name
     private int GetDiceSideNumber(string spriteName)
     {
         switch (spriteName)
@@ -88,7 +55,17 @@ public class Dice : MonoBehaviour
                 return 6;
             default:
                 Debug.LogError("Unknown sprite name: " + spriteName);
-                return -1; // Invalid number
+                return -1;
         }
+    }
+
+    public bool IsRolled
+    {
+        get { return isRolled; }
+    }
+
+    public int GetDiceValue()
+    {
+        return diceValue;
     }
 }

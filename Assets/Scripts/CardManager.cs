@@ -7,14 +7,19 @@ public class CardManager : MonoBehaviour
     public Button cardButton2;
     public Button cardButton3;
     public Sprite[] cardSprites;
-    private TurnManager turnManager;
 
     private string[] cardEffects = { "ExtraTurn", "MoveDouble", "BlockOpponent" };
+    private bool isCardSelected = false;
+    private string selectedCardEffect;
 
     private void Start()
     {
         HideCardButtons();
-        turnManager = FindObjectOfType<TurnManager>(); // Find TurnManager in the scene
+
+        // Add listeners to buttons
+        cardButton1.onClick.AddListener(() => OnCardSelected(cardButton1));
+        cardButton2.onClick.AddListener(() => OnCardSelected(cardButton2));
+        cardButton3.onClick.AddListener(() => OnCardSelected(cardButton3));
     }
 
     public void ShowCards()
@@ -37,8 +42,23 @@ public class CardManager : MonoBehaviour
 
     public void OnCardSelected(Button selectedCard)
     {
-        string effect = cardEffects[System.Array.IndexOf(cardSprites, selectedCard.image.sprite)];
-        turnManager.OnCardSelected(effect); // Notify TurnManager of selected card
+        selectedCardEffect = cardEffects[System.Array.IndexOf(cardSprites, selectedCard.image.sprite)];
+        isCardSelected = true;
         HideCardButtons();
+    }
+
+    public bool IsCardSelected
+    {
+        get { return isCardSelected; }
+    }
+
+    public string GetSelectedCardEffect()
+    {
+        return selectedCardEffect;
+    }
+
+    public void ResetCardSelection()
+    {
+        isCardSelected = false;
     }
 }
