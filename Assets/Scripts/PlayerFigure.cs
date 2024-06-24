@@ -9,9 +9,8 @@ public class PlayerFigure : MonoBehaviour
 
     private void Start()
     {
-
-            transform.position = GameManager.instance.boardPositions[currentPositionIndex].position;
-     
+        currentPositionIndex = startIndex; // Initialize currentPositionIndex to startIndex
+        transform.position = GameManager.instance.boardPositions[currentPositionIndex].position;
     }
 
     public void Move(int steps)
