@@ -14,6 +14,14 @@ public class Dice : MonoBehaviour
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
     }
 
+    private void OnMouseDown()
+    {
+        if (!isRolled)
+        {
+            RollDice();
+        }
+    }
+
     public void RollDice()
     {
         StartCoroutine(RollTheDice());
@@ -67,5 +75,10 @@ public class Dice : MonoBehaviour
     public int GetDiceValue()
     {
         return diceValue;
+    }
+
+    public void ResetRoll()
+    {
+        isRolled = false;
     }
 }

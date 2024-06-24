@@ -26,8 +26,14 @@ public class TurnManager : MonoBehaviour
 
     private IEnumerator TurnSequence()
     {
-        // Step 1: Roll the dice
-        yield return StartCoroutine(RollDice());
+        // Reset dice roll status
+        dice.ResetRoll();
+
+        // Wait until the dice is rolled
+        yield return new WaitUntil(() => dice.IsRolled);
+
+        // Get the rolled value
+        diceValue = dice.GetDiceValue();
 
         // Step 2: Show cards and let player choose one
         cardManager.ShowCards();
@@ -43,14 +49,6 @@ public class TurnManager : MonoBehaviour
 
         // Proceed to the next player
         currentPlayerIndex++;
-    }
-
-    private IEnumerator RollDice()
-    {
-        dice.RollDice();
-        // Wait until dice roll is complete
-        yield return new WaitUntil(() => dice.IsRolled);
-        diceValue = dice.GetDiceValue();
     }
 
     private void ApplyCardEffect(string effect)
